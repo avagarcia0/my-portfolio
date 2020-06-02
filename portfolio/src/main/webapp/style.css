@@ -4,6 +4,11 @@
   width: 650px;
 }
 
-#greeting-container {
+#voting-method-container {
   margin-top: 20px;
+}
+
+img.resize {
+  max-width: 100%;
+  max-height: 100%;
 }
