@@ -31,5 +31,5 @@ function addRandomVotingMethod() {
 
   // Add it to the page.
   const votingMethodContainer = document.getElementById('voting-method-container');
-  votingMethodContainer.innerText = votingMethod + ": " + property;
+  votingMethodContainer.innerText = votingMethod + ': ' + property;
 }
