@@ -19,8 +19,8 @@ function addRandomVotingMethod() {
   const votingMethods = [
     {
       name: 'STAR voting',
-      property:
-          'Performs well in a variety of simulations making different assumptions',
+      property: 'Performs well in a variety of simulations making different ' +
+          'assumptions',
     },
     {name: 'Score voting', property: 'Simple but expressive'},
     {name: '3-2-1 voting', property: 'Highly resistant to strategy'},
@@ -51,7 +51,7 @@ async function displayComments() {
 
   commentsContainer.innerText = '';
 
-  for (comment of comments) {
+  for (const comment of comments) {
     commentsContainer.innerText += comment + '\n';
   }
 }
