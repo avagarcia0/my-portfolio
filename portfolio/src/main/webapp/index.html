@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
   <head>
     <meta charset="UTF-8" />
     <title>Ava Garcia's Portfolio</title>
@@ -25,18 +25,18 @@
         simulations conducted by Jameson Quinn:
       </p>
 
-      <img class="vse-image" src=/images/VSE.jpg alt="Voter Satisfaction Efficiency Graphic">
+      <img class="vse-image" src="/images/VSE.jpg" alt="Voter Satisfaction Efficiency Graphic">
 
       <p>Click here to get the name of a random voting method and a property it has that I like:</p>
-      <button onclick="addRandomVotingMethod()">Random Voting Method</button>
+      <button type="button" onclick="addRandomVotingMethod()">Random Voting Method</button>
       <div id="voting-method-container"></div>
 
-      <form action="/data" method="POST">
+      <form action="/data" method="post">
         <p>Leave a comment:</p>
         <textarea name="comment-submission"></textarea>
         <br /><br />
 
-        <input type="submit" />
+        <button type="submit">Submit</button>
       </form>
 
       <div id="comments-container"></div>
