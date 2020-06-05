@@ -60,12 +60,12 @@ public class DataServlet extends HttpServlet {
     String body = getParameter(request, "comment-submission", "");
     long timestamp = System.currentTimeMillis();
 
-    Entity taskEntity = new Entity("Comment");
-    taskEntity.setProperty("body", body);
-    taskEntity.setProperty("timestamp", timestamp);
+    Entity commentEntity = new Entity("Comment");
+    commentEntity.setProperty("body", body);
+    commentEntity.setProperty("timestamp", timestamp);
 
     DatastoreService datastore = DatastoreServiceFactory.getDatastoreService();
-    datastore.put(taskEntity);
+    datastore.put(commentEntity);
 
     // Redirect back to the HTML page.
     response.sendRedirect("/index.html");
