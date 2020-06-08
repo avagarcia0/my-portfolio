@@ -49,6 +49,12 @@ public class DataServlet extends HttpServlet {
       comments.add(body);
     }
 
+    int numComments = getNumCommentsToDisplay(request);
+
+    if (numComments >= 0 && numComments <= comments.size()) {
+      comments = comments.subList(0, numComments);
+    }
+
     Gson gson = new Gson();
     response.setContentType("text/html;");
     response.getWriter().println(gson.toJson(comments));
@@ -81,5 +87,30 @@ public class DataServlet extends HttpServlet {
       return defaultValue;
     }
     return value;
+  }
+
+  /**
+   * @return the number of comments to display, or -1 if the number was invalid
+   */
+  private int getNumCommentsToDisplay(HttpServletRequest request) {
+    // Get the input from the form.
+    String numCommentsString = getParameter(request, "num-comments", null);
+
+    // Convert the input to an int.
+    int numComments;
+    try {
+      numComments = Integer.parseInt(numCommentsString);
+    } catch (NumberFormatException e) {
+      System.err.println("Could not convert to int: " + numCommentsString);
+      return -1;
+    }
+
+    // Check that the input is non-negative.
+    if (numComments < 0) {
+      System.err.println("Number of comments is negative: " + numCommentsString);
+      return -1;
+    }
+
+    return numComments;
   }
 }

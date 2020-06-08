@@ -45,7 +45,7 @@ function addRandomVotingMethod() {
  * Displays the comments that have been left so far.
  */
 async function displayComments() {
-  const response = await fetch('/data');
+  const response = await fetch('/data?num-comments=3');
   const comments = await response.json();
   const commentsContainer = document.getElementById('comments-container');
 
