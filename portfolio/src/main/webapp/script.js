@@ -40,10 +40,16 @@ function addRandomVotingMethod() {
 }
 
 /**
- * Adds a message from the servlet to the page.
+ * Displays the comments that have been left so far.
  */
-async function getMessage() {
+async function displayComments() {
   const response = await fetch('/data');
-  const message = await response.text();
-  document.getElementById('message-container').innerText = message;
+  const comments = await response.json();
+  const commentsContainer = document.getElementById('comments-container');
+
+  commentsContainer.innerText = '';
+
+  for (comment of comments) {
+    commentsContainer.innerText += comment + '\n';
+  }
 }
