@@ -56,3 +56,11 @@ async function displayComments() {
     commentsContainer.innerText += comment + '\n';
   }
 }
+
+/**
+ * Deletes all comments currently being stored.
+ */
+async function deleteAllComments() {
+  await fetch('/delete-data', {method: 'POST'});
+  displayComments();
+}
