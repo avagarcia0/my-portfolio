@@ -6,7 +6,7 @@
     <link rel="stylesheet" href="style.css">
     <script src="script.js"></script>
   </head>
-  <body>
+  <body onload="getMessage()">
     <div id="content">
       <h1>Ava Garcia's Portfolio</h1>
       <p>
@@ -34,6 +34,8 @@
       <p>Click here to get the name of a random voting method and a property it has that I like:</p>
       <button onclick="addRandomVotingMethod()">Random Voting Method</button>
       <div id="voting-method-container"></div>
+
+      <div id="message-container"></div>
     </div>
   </body>
 </html>

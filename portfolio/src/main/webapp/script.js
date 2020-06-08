@@ -38,3 +38,12 @@ function addRandomVotingMethod() {
   const votingMethodContainer = document.getElementById('voting-method-container');
   votingMethodContainer.innerText = votingMethod.name + ': ' + votingMethod.property;
 }
+
+/**
+ * Adds a message from the servlet to the page.
+ */
+async function getMessage() {
+  const response = await fetch('/data');
+  const message = await response.text();
+  document.getElementById('message-container').innerText = message;
+}
