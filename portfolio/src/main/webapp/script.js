@@ -50,10 +50,12 @@ async function displayComments() {
   const comments = await response.json();
   const commentsContainer = document.getElementById('comments-container');
 
-  commentsContainer.innerText = '';
+  commentsContainer.innerHTML = '';
 
   for (const comment of comments) {
-    commentsContainer.innerText += comment + '\n';
+    const commentElement = document.createElement('div');
+    commentElement.innerText = comment;
+    commentsContainer.appendChild(commentElement);
   }
 }
 
