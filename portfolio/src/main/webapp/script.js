@@ -13,16 +13,28 @@
 // limitations under the License.
 
 /**
- * Adds a random voting method to the page.
+ * Adds a random voting method and a nice property it has to the page.
  */
 function addRandomVotingMethod() {
-  const votingMethods =
-      ['STAR voting', 'Score voting', '3-2-1 voting', 'Approval voting'];
+  const votingMethods = [
+    {
+      name: "STAR voting",
+      property:
+        "Performs well in a variety of simulations making different assumptions",
+    },
+    { name: "Score voting", property: "Simple but expressive" },
+    { name: "3-2-1 voting", property: "Highly resistant to strategy" },
+    {
+      name: "Approval voting",
+      property: "Incredibly simple, just vote for one or more",
+    },
+  ];
 
   // Pick a random voting method.
-  const votingMethod = votingMethods[Math.floor(Math.random() * votingMethods.length)];
+  const index = Math.floor(Math.random() * votingMethods.length);
+  const votingMethod = votingMethods[index];
 
   // Add it to the page.
   const votingMethodContainer = document.getElementById('voting-method-container');
-  votingMethodContainer.innerText = votingMethod;
+  votingMethodContainer.innerText = votingMethod.name + ': ' + votingMethod.property;
 }
