@@ -18,15 +18,15 @@
 function addRandomVotingMethod() {
   const votingMethods = [
     {
-      name: "STAR voting",
-      property:
-        "Performs well in a variety of simulations making different assumptions",
+      name: 'STAR voting',
+      property: 'Performs well in a variety of simulations making different ' +
+          'assumptions',
     },
-    { name: "Score voting", property: "Simple but expressive" },
-    { name: "3-2-1 voting", property: "Highly resistant to strategy" },
+    {name: 'Score voting', property: 'Simple but expressive'},
+    {name: '3-2-1 voting', property: 'Highly resistant to strategy'},
     {
-      name: "Approval voting",
-      property: "Incredibly simple, just vote for one or more",
+      name: 'Approval voting',
+      property: 'Incredibly simple, just vote for one or more',
     },
   ];
 
@@ -35,8 +35,10 @@ function addRandomVotingMethod() {
   const votingMethod = votingMethods[index];
 
   // Add it to the page.
-  const votingMethodContainer = document.getElementById('voting-method-container');
-  votingMethodContainer.innerText = votingMethod.name + ': ' + votingMethod.property;
+  const votingMethodContainer =
+      document.getElementById('voting-method-container');
+  votingMethodContainer.innerText =
+      votingMethod.name + ': ' + votingMethod.property;
 }
 
 /**
@@ -49,7 +51,7 @@ async function displayComments() {
 
   commentsContainer.innerText = '';
 
-  for (comment of comments) {
+  for (const comment of comments) {
     commentsContainer.innerText += comment + '\n';
   }
 }
