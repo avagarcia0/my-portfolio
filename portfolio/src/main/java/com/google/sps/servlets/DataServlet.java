@@ -90,11 +90,15 @@ public class DataServlet extends HttpServlet {
   }
 
   /**
-   * @return the number of comments to display, or -1 if the number was invalid
+   * @return the number of comments to display, or -1 if all comments should be displayed
    */
   private int getNumCommentsToDisplay(HttpServletRequest request) {
     // Get the input from the form.
     String numCommentsString = getParameter(request, "num-comments", null);
+
+    if (numCommentsString.equals("All")) {
+      return -1;
+    }
 
     // Convert the input to an int.
     int numComments;
