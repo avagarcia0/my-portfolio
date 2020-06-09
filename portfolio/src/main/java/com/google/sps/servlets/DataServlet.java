@@ -17,6 +17,7 @@ package com.google.sps.servlets;
 import com.google.appengine.api.datastore.DatastoreService;
 import com.google.appengine.api.datastore.DatastoreServiceFactory;
 import com.google.appengine.api.datastore.Entity;
+import com.google.appengine.api.datastore.FetchOptions;
 import com.google.appengine.api.datastore.PreparedQuery;
 import com.google.appengine.api.datastore.Query;
 import com.google.appengine.api.datastore.Query.SortDirection;
@@ -40,19 +41,19 @@ public class DataServlet extends HttpServlet {
     DatastoreService datastore = DatastoreServiceFactory.getDatastoreService();
     PreparedQuery results = datastore.prepare(query);
 
-    List<String> comments = new ArrayList();
-    for (Entity entity : results.asIterable()) {
-      long id = entity.getKey().getId();
-      String body = (String) entity.getProperty("body");
-      long timestamp = (long) entity.getProperty("timestamp");
-
-      comments.add(body);
-    }
-
+    FetchOptions fetchOptions;
     int numComments = getNumCommentsToDisplay(request);
 
-    if (numComments >= 0 && numComments <= comments.size()) {
-      comments = comments.subList(0, numComments);
+    if (numComments >= 0) {
+      fetchOptions = FetchOptions.Builder.withLimit(numComments);
+    } else {
+      fetchOptions = FetchOptions.Builder.withDefaults();
+    }
+
+    List<String> comments = new ArrayList();
+    for (Entity entity : results.asIterable(fetchOptions)) {
+      String body = (String) entity.getProperty("body");
+      comments.add(body);
     }
 
     Gson gson = new Gson();
