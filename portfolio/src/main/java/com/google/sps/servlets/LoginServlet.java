@@ -23,6 +23,7 @@ import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
+/** Servlet that returns the login URL and status for the user. */
 @WebServlet("/login")
 public class LoginServlet extends HttpServlet {
   @Override
