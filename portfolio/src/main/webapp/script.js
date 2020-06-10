@@ -45,7 +45,8 @@ function addRandomVotingMethod() {
  * Displays the comments that have been left so far.
  */
 async function displayComments() {
-  const response = await fetch('/data');
+  const numComments = document.getElementById('num-comments').value;
+  const response = await fetch('/data?num-comments=' + numComments);
   const comments = await response.json();
   const commentsContainer = document.getElementById('comments-container');
 
@@ -54,4 +55,12 @@ async function displayComments() {
   for (const comment of comments) {
     commentsContainer.innerText += comment + '\n';
   }
+}
+
+/**
+ * Deletes all comments currently being stored.
+ */
+async function deleteAllComments() {
+  await fetch('/delete-data', {method: 'POST'});
+  displayComments();
 }

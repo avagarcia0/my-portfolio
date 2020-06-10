@@ -17,6 +17,7 @@ package com.google.sps.servlets;
 import com.google.appengine.api.datastore.DatastoreService;
 import com.google.appengine.api.datastore.DatastoreServiceFactory;
 import com.google.appengine.api.datastore.Entity;
+import com.google.appengine.api.datastore.FetchOptions;
 import com.google.appengine.api.datastore.PreparedQuery;
 import com.google.appengine.api.datastore.Query;
 import com.google.appengine.api.datastore.Query.SortDirection;
@@ -40,12 +41,18 @@ public class DataServlet extends HttpServlet {
     DatastoreService datastore = DatastoreServiceFactory.getDatastoreService();
     PreparedQuery results = datastore.prepare(query);
 
-    List<String> comments = new ArrayList();
-    for (Entity entity : results.asIterable()) {
-      long id = entity.getKey().getId();
-      String body = (String) entity.getProperty("body");
-      long timestamp = (long) entity.getProperty("timestamp");
+    FetchOptions fetchOptions;
+    int numComments = getNumCommentsToDisplay(request);
 
+    if (numComments >= 0) {
+      fetchOptions = FetchOptions.Builder.withLimit(numComments);
+    } else {
+      fetchOptions = FetchOptions.Builder.withDefaults();
+    }
+
+    List<String> comments = new ArrayList();
+    for (Entity entity : results.asIterable(fetchOptions)) {
+      String body = (String) entity.getProperty("body");
       comments.add(body);
     }
 
@@ -81,5 +88,34 @@ public class DataServlet extends HttpServlet {
       return defaultValue;
     }
     return value;
+  }
+
+  /**
+   * @return the number of comments to display, or -1 if all comments should be displayed
+   */
+  private int getNumCommentsToDisplay(HttpServletRequest request) {
+    // Get the input from the form.
+    String numCommentsString = getParameter(request, "num-comments", null);
+
+    if (numCommentsString.equals("All")) {
+      return -1;
+    }
+
+    // Convert the input to an int.
+    int numComments;
+    try {
+      numComments = Integer.parseInt(numCommentsString);
+    } catch (NumberFormatException e) {
+      System.err.println("Could not convert to int: " + numCommentsString);
+      return -1;
+    }
+
+    // Check that the input is non-negative.
+    if (numComments < 0) {
+      System.err.println("Number of comments is negative: " + numCommentsString);
+      return -1;
+    }
+
+    return numComments;
   }
 }

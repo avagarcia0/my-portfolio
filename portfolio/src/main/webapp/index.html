@@ -39,7 +39,20 @@
         <button type="submit">Submit</button>
       </form>
 
+      <label for="num-comments">Number of comments to display:</label>
+      <select name="num-comments" id="num-comments" onchange="displayComments()">
+        <option value="All">All</option>
+        <option value="0">None</option>
+        <option value="5">5</option>
+        <option value="10">10</option>
+        <option value="20">20</option>
+        <option value="50">50</option>
+        <option value="100">100</option>
+      </select>
+
       <div id="comments-container"></div>
+
+      <button type="button" onclick="deleteAllComments()">Nuke comments</button>
     </div>
   </body>
 </html>
