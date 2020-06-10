@@ -16,7 +16,7 @@
 form {
   border: 1px solid #bbb;
   border-radius: 1em;
-  margin: 0 auto;
+  margin: 20px auto 15px;
   padding: 1em;
   width: 500px;
 }
@@ -27,4 +27,17 @@ textarea {
   font: 1em sans-serif;
   height: 135px;
   width: 100%;
+}
+
+#comments-container div {
+  background: #ddd;
+  border: 1px solid #000;
+  margin: 15px 0 15px;
+  padding: 5px;
+}
+
+#delete-comments-container {
+  display: flex;
+  justify-content: center;
+  margin: 15px auto 15px;
 }
