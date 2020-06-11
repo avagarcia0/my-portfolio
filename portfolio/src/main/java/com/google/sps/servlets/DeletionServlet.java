@@ -20,6 +20,8 @@ import com.google.appengine.api.datastore.Entity;
 import com.google.appengine.api.datastore.Key;
 import com.google.appengine.api.datastore.PreparedQuery;
 import com.google.appengine.api.datastore.Query;
+import com.google.appengine.api.users.UserService;
+import com.google.appengine.api.users.UserServiceFactory;
 import com.google.common.collect.Iterables;
 import java.io.IOException;
 import javax.servlet.annotation.WebServlet;
@@ -32,6 +34,13 @@ import javax.servlet.http.HttpServletResponse;
 public class DeletionServlet extends HttpServlet {
   @Override
   public void doPost(HttpServletRequest request, HttpServletResponse response) throws IOException {
+    UserService userService = UserServiceFactory.getUserService();
+
+    // Only delete all comments if the user is logged in as an admin
+    if (!userService.isUserLoggedIn() || !userService.isUserAdmin()) {
+      return;
+    }
+
     Query query = new Query("Comment");
 
     DatastoreService datastore = DatastoreServiceFactory.getDatastoreService();
