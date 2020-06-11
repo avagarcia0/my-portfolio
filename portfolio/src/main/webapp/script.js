@@ -65,19 +65,15 @@ async function displayComments() {
 async function displayLoginInfo() {
   const response = await fetch('/login');
   const loginInfo = await response.json();
-  const loginUrl = loginInfo[0];
-  const logoutUrl = loginInfo[1];
-  const userEmail = loginInfo[2];
-
   const loginContainer = document.getElementById('login-container');
 
   // Check if the user is logged in.
-  if (userEmail === null) {
+  if (!loginInfo.isLoggedIn) {
     loginContainer.innerHTML =
-        '<a href="' + loginUrl + '">Click here to log in</a>';
+        '<a href="' + loginInfo.loginUrl + '">Click here to log in</a>';
   } else {
-    loginContainer.innerHTML = 'Logged in as ' + userEmail + '<br /><a href="' +
-        logoutUrl + '">Click here to log out</a>';
+    loginContainer.innerHTML = 'Logged in as ' + loginInfo.userEmail +
+        '<br /><a href="' + loginInfo.logoutUrl + '">Click here to log out</a>';
   }
 }
 

@@ -17,6 +17,7 @@ package com.google.sps.servlets;
 import com.google.appengine.api.users.UserService;
 import com.google.appengine.api.users.UserServiceFactory;
 import com.google.gson.Gson;
+import com.google.sps.data.LoginInfo;
 import java.io.IOException;
 import javax.servlet.annotation.WebServlet;
 import javax.servlet.http.HttpServlet;
@@ -29,23 +30,18 @@ public class LoginServlet extends HttpServlet {
   @Override
   public void doGet(HttpServletRequest request, HttpServletResponse response) throws IOException {
     UserService userService = UserServiceFactory.getUserService();
+    LoginInfo loginInfo;
     String redirectUrl = "/";
-    String loginUrl;
-    String logoutUrl;
-    String userEmail;
 
     if (userService.isUserLoggedIn()) {
-      userEmail = userService.getCurrentUser().getEmail();
-      loginUrl = null;
-      logoutUrl = userService.createLogoutURL(redirectUrl);
+      loginInfo = new LoginInfo(userService.createLogoutURL(redirectUrl),
+          userService.getCurrentUser().getEmail(), userService.isUserAdmin());
     } else {
-      userEmail = null;
-      loginUrl = userService.createLoginURL(redirectUrl);
-      logoutUrl = null;
+      loginInfo = new LoginInfo(userService.createLoginURL(redirectUrl));
     }
 
     Gson gson = new Gson();
     response.setContentType("text/html;");
-    response.getWriter().println(gson.toJson(new String[] {loginUrl, logoutUrl, userEmail}));
+    response.getWriter().println(gson.toJson(loginInfo));
   }
 }
