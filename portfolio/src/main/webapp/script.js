@@ -60,11 +60,19 @@ async function displayComments() {
 }
 
 /**
- * Displays the login status of the user and a link for logging in or out.
+ * Retrieves the login information for the user.
  */
-async function displayLoginInfo() {
+async function getLoginInfo() {
   const response = await fetch('/login');
   const loginInfo = await response.json();
+
+  return loginInfo;
+}
+
+/**
+ * Displays the login status of the user and a link for logging in or out.
+ */
+async function displayLoginInfo(loginInfo) {
   const loginContainer = document.getElementById('login-container');
 
   // Check if the user is logged in.
@@ -81,8 +89,10 @@ async function displayLoginInfo() {
  * Displays comments and login info.
  */
 async function displayInfo() {
-  await displayComments();
-  displayLoginInfo();
+  displayComments();
+  const loginInfo = await getLoginInfo();
+
+  displayLoginInfo(loginInfo);
 }
 
 /**
