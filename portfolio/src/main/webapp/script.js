@@ -84,8 +84,8 @@ async function displayLoginInfo() {
 /**
  * Displays comments and login info.
  */
-async function displayInfo() {
-  await displayComments();
+function displayInfo() {
+  displayComments();
   displayLoginInfo();
 }
 
