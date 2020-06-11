@@ -72,7 +72,7 @@ async function getLoginInfo() {
 /**
  * Displays the login status of the user and a link for logging in or out.
  */
-async function displayLoginInfo(loginInfo) {
+function displayLoginInfo(loginInfo) {
   const loginContainer = document.getElementById('login-container');
 
   // Check if the user is logged in.
@@ -86,6 +86,21 @@ async function displayLoginInfo(loginInfo) {
 }
 
 /**
+ * Displays the button for deleting all comments iff the user is an admin.
+ */
+function displayDeleteCommentsButton(loginInfo) {
+  const deleteCommentsContainer =
+      document.getElementById('delete-comments-container');
+
+  // Check if the user is an administator.
+  if (loginInfo.isAdmin) {
+    deleteCommentsContainer.style.display = 'flex';
+  } else {
+    deleteCommentsContainer.style.display = 'none';
+  }
+}
+
+/**
  * Displays comments and login info.
  */
 async function displayInfo() {
@@ -93,6 +108,7 @@ async function displayInfo() {
   const loginInfo = await getLoginInfo();
 
   displayLoginInfo(loginInfo);
+  displayDeleteCommentsButton(loginInfo);
 }
 
 /**
