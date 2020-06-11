@@ -60,6 +60,36 @@ async function displayComments() {
 }
 
 /**
+ * Displays the login status of the user and a link for logging in or out.
+ */
+async function displayLoginInfo() {
+  const response = await fetch('/login');
+  const loginInfo = await response.json();
+  const loginUrl = loginInfo[0];
+  const logoutUrl = loginInfo[1];
+  const userEmail = loginInfo[2];
+
+  const loginContainer = document.getElementById('login-container');
+
+  // Check if the user is logged in.
+  if (userEmail === null) {
+    loginContainer.innerHTML =
+        '<a href="' + loginUrl + '">Click here to log in</a>';
+  } else {
+    loginContainer.innerHTML = 'Logged in as ' + userEmail + '<br /><a href="' +
+        logoutUrl + '">Click here to log out</a>';
+  }
+}
+
+/**
+ * Displays comments and login info.
+ */
+function displayInfo() {
+  displayComments();
+  displayLoginInfo();
+}
+
+/**
  * Deletes all comments currently being stored.
  */
 async function deleteAllComments() {
