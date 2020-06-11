@@ -23,7 +23,7 @@ import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
-/** Servlet that returns the login URL and status for the user. */
+/** Servlet that returns the login or logout URL and status for the user. */
 @WebServlet("/login")
 public class LoginServlet extends HttpServlet {
   @Override
@@ -31,18 +31,21 @@ public class LoginServlet extends HttpServlet {
     UserService userService = UserServiceFactory.getUserService();
     String redirectUrl = "/";
     String loginUrl;
+    String logoutUrl;
     String userEmail;
 
     if (userService.isUserLoggedIn()) {
       userEmail = userService.getCurrentUser().getEmail();
-      loginUrl = userService.createLogoutURL(redirectUrl);
+      loginUrl = null;
+      logoutUrl = userService.createLogoutURL(redirectUrl);
     } else {
       userEmail = null;
       loginUrl = userService.createLoginURL(redirectUrl);
+      logoutUrl = null;
     }
 
     Gson gson = new Gson();
     response.setContentType("text/html;");
-    response.getWriter().println(gson.toJson(new String[] {loginUrl, userEmail}));
+    response.getWriter().println(gson.toJson(new String[] {loginUrl, logoutUrl, userEmail}));
   }
 }

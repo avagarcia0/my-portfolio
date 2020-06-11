@@ -66,7 +66,8 @@ async function displayLoginInfo() {
   const response = await fetch('/login');
   const loginInfo = await response.json();
   const loginUrl = loginInfo[0];
-  const userEmail = loginInfo[1];
+  const logoutUrl = loginInfo[1];
+  const userEmail = loginInfo[2];
 
   const loginContainer = document.getElementById('login-container');
 
@@ -76,7 +77,7 @@ async function displayLoginInfo() {
         '<a href="' + loginUrl + '">Click here to log in</a>';
   } else {
     loginContainer.innerHTML = 'Logged in as ' + userEmail + '<br /><a href="' +
-        loginUrl + '">Click here to log out</a>';
+        logoutUrl + '">Click here to log out</a>';
   }
 }
 
