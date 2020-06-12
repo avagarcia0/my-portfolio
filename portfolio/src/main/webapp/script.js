@@ -86,7 +86,8 @@ function displayLoginInfo(loginInfo) {
 }
 
 /**
- * Displays the button for deleting all comments iff the user is an admin.
+ * Displays the button for deleting all comments if and only if the user is an
+ * admin.
  */
 function displayDeleteCommentsButton(loginInfo) {
   const deleteCommentsContainer =
