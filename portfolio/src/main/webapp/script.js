@@ -60,33 +60,56 @@ async function displayComments() {
 }
 
 /**
- * Displays the login status of the user and a link for logging in or out.
+ * Retrieves the login information for the user.
  */
-async function displayLoginInfo() {
+async function getLoginInfo() {
   const response = await fetch('/login');
   const loginInfo = await response.json();
-  const loginUrl = loginInfo[0];
-  const logoutUrl = loginInfo[1];
-  const userEmail = loginInfo[2];
 
+  return loginInfo;
+}
+
+/**
+ * Displays the login status of the user and a link for logging in or out.
+ */
+function displayLoginInfo(loginInfo) {
   const loginContainer = document.getElementById('login-container');
 
   // Check if the user is logged in.
-  if (userEmail === null) {
-    loginContainer.innerHTML =
-        '<a href="' + loginUrl + '">Click here to log in</a>';
+  if (loginInfo.isLoggedIn) {
+    loginContainer.innerHTML = 'Logged in as ' + loginInfo.userEmail +
+        '<br /><a href="' + loginInfo.logoutUrl + '">Click here to log out</a>';
   } else {
-    loginContainer.innerHTML = 'Logged in as ' + userEmail + '<br /><a href="' +
-        logoutUrl + '">Click here to log out</a>';
+    loginContainer.innerHTML =
+        '<a href="' + loginInfo.loginUrl + '">Click here to log in</a>';
   }
 }
 
 /**
- * Displays comments and login info.
+ * Displays the button for deleting all comments if and only if the user is an
+ * admin.
  */
-function displayInfo() {
+function displayDeleteCommentsButton(loginInfo) {
+  const deleteCommentsContainer =
+      document.getElementById('delete-comments-container');
+
+  // Check if the user is an administator.
+  if (loginInfo.isAdmin) {
+    deleteCommentsContainer.style.display = 'flex';
+  } else {
+    deleteCommentsContainer.style.display = 'none';
+  }
+}
+
+/**
+ * Initializes all JavaScript portions of the page.
+ */
+async function initializePage() {
   displayComments();
-  displayLoginInfo();
+  const loginInfo = await getLoginInfo();
+
+  displayLoginInfo(loginInfo);
+  displayDeleteCommentsButton(loginInfo);
 }
 
 /**

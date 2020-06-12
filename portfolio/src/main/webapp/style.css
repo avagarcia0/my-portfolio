@@ -37,7 +37,7 @@ textarea {
 }
 
 #delete-comments-container {
-  display: flex;
+  display: none;
   justify-content: center;
   margin: 15px auto 15px;
 }
