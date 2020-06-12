@@ -4,6 +4,7 @@
     <meta charset="UTF-8" />
     <title>Ava Garcia's Portfolio</title>
     <link rel="stylesheet" href="style.css" />
+    <script src="https://www.gstatic.com/charts/loader.js"></script>
     <script src="script.js"></script>
   </head>
   <body onload="initializePage()">
@@ -26,6 +27,14 @@
       </p>
 
       <img class="vse-image" src="/images/VSE.jpg" alt="Voter Satisfaction Efficiency Graphic" />
+
+      <p>
+        A closely related concept is Bayesian Regret, which can be shortened to regret or BR. Bayesian Regret is kind of
+        like the opposite of VSE. The less regret a method causes, the better it does at satisfying voter's preferences.
+        The following is a graph showing Bayesian Regret results from one of Warren D. Smith's simulations:
+      </p>
+
+      <div id="chart-container"></div>
 
       <p>Click here to get the name of a random voting method and a property it has that I like:</p>
       <button type="button" onclick="addRandomVotingMethod()">Random Voting Method</button>

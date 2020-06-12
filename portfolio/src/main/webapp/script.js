@@ -12,6 +12,10 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+/* global google */
+google.charts.load('current', {'packages': ['corechart']});
+google.charts.setOnLoadCallback(displayChart);
+
 /**
  * Adds a random voting method and a nice property it has to the page.
  */
@@ -102,10 +106,36 @@ function displayDeleteCommentsButton(loginInfo) {
 }
 
 /**
+ * Creates a chart and adds it to the page.
+ */
+function displayChart() {
+  const data = new google.visualization.DataTable();
+  data.addColumn('string', 'Voting Method');
+  data.addColumn('number', 'Bayesian Regret');
+  data.addRows([
+    ['STAR', 0.1206],
+    ['Approval', 0.18983],
+    ['IRV', 0.21684],
+    ['Plurality', 0.33137],
+  ]);
+
+  const options = {
+    'title': 'Bayesian Regret of Voting Methods',
+    'width': 600,
+    'height': 400,
+  };
+
+  const chart = new google.visualization.BarChart(
+      document.getElementById('chart-container'));
+  chart.draw(data, options);
+}
+
+/**
  * Initializes all JavaScript portions of the page.
  */
 async function initializePage() {
   displayComments();
+  displayChart();
   const loginInfo = await getLoginInfo();
 
   displayLoginInfo(loginInfo);
