@@ -101,9 +101,9 @@ function displayDeleteCommentsButton(loginInfo) {
 }
 
 /**
- * Displays comments and login info.
+ * Initializes all JavaScript portions of the page.
  */
-async function displayInfo() {
+async function initializePage() {
   displayComments();
   const loginInfo = await getLoginInfo();
 
