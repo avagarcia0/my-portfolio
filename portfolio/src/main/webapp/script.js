@@ -80,17 +80,18 @@ function displayLoginInfo(loginInfo) {
   const loginContainer = document.getElementById('login-container');
 
   // Check if the user is logged in.
-  if (!loginInfo.isLoggedIn) {
-    loginContainer.innerHTML =
-        '<a href="' + loginInfo.loginUrl + '">Click here to log in</a>';
-  } else {
+  if (loginInfo.isLoggedIn) {
     loginContainer.innerHTML = 'Logged in as ' + loginInfo.userEmail +
         '<br /><a href="' + loginInfo.logoutUrl + '">Click here to log out</a>';
+  } else {
+    loginContainer.innerHTML =
+        '<a href="' + loginInfo.loginUrl + '">Click here to log in</a>';
   }
 }
 
 /**
- * Displays the button for deleting all comments iff the user is an admin.
+ * Displays the button for deleting all comments if and only if the user is an
+ * admin.
  */
 function displayDeleteCommentsButton(loginInfo) {
   const deleteCommentsContainer =
@@ -130,9 +131,9 @@ function displayChart() {
 }
 
 /**
- * Displays comments and login info.
+ * Initializes all JavaScript portions of the page.
  */
-async function displayInfo() {
+async function initializePage() {
   displayComments();
   displayChart();
   const loginInfo = await getLoginInfo();
