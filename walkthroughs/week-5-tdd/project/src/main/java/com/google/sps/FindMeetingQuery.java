@@ -15,6 +15,7 @@
 package com.google.sps;
 
 import java.util.Collection;
+import java.util.Collections;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -31,6 +32,24 @@ public final class FindMeetingQuery {
           conflictingTimes.add(event.getWhen());
           break;
         }
+      }
+    }
+
+    Collections.sort(conflictingTimes, TimeRange.ORDER_BY_START);
+
+    // Remove duplicates and overlaps
+    for (int i = 0; i < conflictingTimes.size() - 1; i++) {
+      TimeRange first = conflictingTimes.get(i);
+      TimeRange second = conflictingTimes.get(i + 1);
+
+      if (first.overlaps(second)) {
+        if (!first.contains(second)) {
+          TimeRange combined = TimeRange.fromStartEnd(first.start(), second.end(), false);
+          conflictingTimes.set(i, combined);
+        }
+
+        conflictingTimes.remove(second);
+        i--;
       }
     }
 
