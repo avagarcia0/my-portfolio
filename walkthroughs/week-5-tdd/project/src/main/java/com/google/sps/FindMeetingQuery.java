@@ -70,7 +70,7 @@ public final class FindMeetingQuery {
       }
 
       TimeRange last = conflictingTimes.get(conflictingTimes.size() - 1);
-      valid = TimeRange.fromStartEnd(last.end(), TimeRange.END_OF_DAY, false);
+      valid = TimeRange.fromStartEnd(last.end(), TimeRange.END_OF_DAY, true);
       possibleTimes.add(valid);
     }
 
