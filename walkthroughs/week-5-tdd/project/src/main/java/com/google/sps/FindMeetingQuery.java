@@ -53,6 +53,27 @@ public final class FindMeetingQuery {
       }
     }
 
+    // Find every TimeRange that doesn't have a conflict
+    if (conflictingTimes.isEmpty()) {
+      possibleTimes.add(TimeRange.WHOLE_DAY);
+    } else {
+      TimeRange initial = conflictingTimes.get(0);
+      TimeRange valid = TimeRange.fromStartEnd(TimeRange.START_OF_DAY, initial.start(), false);
+      possibleTimes.add(valid);
+
+      for (int i = 0; i < conflictingTimes.size() - 1; i++) {
+        TimeRange first = conflictingTimes.get(i);
+        TimeRange second = conflictingTimes.get(i + 1);
+
+        valid = TimeRange.fromStartEnd(first.end(), second.start(), false);
+        possibleTimes.add(valid);
+      }
+
+      TimeRange last = conflictingTimes.get(conflictingTimes.size() - 1);
+      valid = TimeRange.fromStartEnd(last.end(), TimeRange.END_OF_DAY, false);
+      possibleTimes.add(valid);
+    }
+
     return possibleTimes;
   }
 }
