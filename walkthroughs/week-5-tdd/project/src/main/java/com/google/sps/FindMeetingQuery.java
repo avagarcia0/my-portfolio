@@ -77,9 +77,10 @@ public final class FindMeetingQuery {
     // Remove every TimeRange that is too short
     long duration = request.getDuration();
 
-    for (TimeRange range : possibleTimes) {
-      if (range.duration() < duration) {
-        possibleTimes.remove(range);
+    for (int i = 0; i < possibleTimes.size(); i++) {
+      if (possibleTimes.get(i).duration() < duration) {
+        possibleTimes.remove(i);
+        i--;
       }
     }
 
