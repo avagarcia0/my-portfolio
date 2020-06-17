@@ -21,9 +21,18 @@ import java.util.List;
 
 public final class FindMeetingQuery {
   public Collection<TimeRange> query(Collection<Event> events, MeetingRequest request) {
+    Collection<String> attendees = request.getAttendees();
+    long duration = request.getDuration();
+
+    List<TimeRange> possibleTimes = findTimesForAllAttendees(events, attendees, duration);
+
+    return possibleTimes;
+  }
+
+  public List<TimeRange> findTimesForAllAttendees(Collection<Event> events,
+      Collection<String> attendees, long duration) {
     List<TimeRange> possibleTimes = new ArrayList<>();
     List<TimeRange> conflictingTimes = new ArrayList<>();
-    Collection<String> attendees = request.getAttendees();
 
     // Find every TimeRange that needs to be avoided
     for (Event event : events) {
@@ -75,8 +84,6 @@ public final class FindMeetingQuery {
     }
 
     // Remove every TimeRange that is too short
-    long duration = request.getDuration();
-
     for (int i = 0; i < possibleTimes.size(); i++) {
       if (possibleTimes.get(i).duration() < duration) {
         possibleTimes.remove(i);
