@@ -14,17 +14,26 @@
 
 package com.google.sps;
 
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
-import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
 
 public final class FindMeetingQuery {
   public Collection<TimeRange> query(Collection<Event> events, MeetingRequest request) {
-    Collection<String> attendees = request.getAttendees();
+    Collection<String> attendees = new HashSet<>();
+    List<TimeRange> possibleTimes;
     long duration = request.getDuration();
 
-    List<TimeRange> possibleTimes = findTimesForAllAttendees(events, attendees, duration);
+    attendees.addAll(request.getAttendees());
+    attendees.addAll(request.getOptionalAttendees());
+
+    possibleTimes = findTimesForAllAttendees(events, attendees, duration);
+
+    if (possibleTimes.isEmpty() && !request.getAttendees().isEmpty()) {
+      possibleTimes = findTimesForAllAttendees(events, request.getAttendees(), duration);
+    }
 
     return possibleTimes;
   }
