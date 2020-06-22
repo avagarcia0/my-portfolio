@@ -36,15 +36,12 @@ public final class FindMeetingQuery {
   }
 
   public List<TimeRange> findConflicts(Collection<Event> events,
-      Collection<String> attendees) {
+      Collection<String> requestAttendees) {
     List<TimeRange> conflicts = new ArrayList<>();
 
     for (Event event : events) {
-      for (String eventAttendee : event.getAttendees()) {
-        if (attendees.contains(eventAttendee)) {
-          conflicts.add(event.getWhen());
-          break;
-        }
+      if (!Collections.disjoint(requestAttendees, event.getAttendees())) {
+        conflicts.add(event.getWhen());
       }
     }
 
