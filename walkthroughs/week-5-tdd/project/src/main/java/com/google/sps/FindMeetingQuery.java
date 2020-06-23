@@ -14,6 +14,7 @@
 
 package com.google.sps;
 
+import com.google.common.collect.ImmutableList;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.ArrayList;
@@ -27,15 +28,15 @@ public final class FindMeetingQuery {
     return possibleTimes;
   }
 
-  public List<TimeRange> findConflictingTimes(Collection<Event> events,
+  public ImmutableList<TimeRange> findConflictingTimes(Collection<Event> events,
       Collection<String> attendees) {
     List<TimeRange> conflicts = findConflicts(events, attendees);
     List<TimeRange> conflictingTimes = mergeOverlappingRanges(conflicts);
 
-    return conflictingTimes;
+    return ImmutableList.copyOf(conflictingTimes);
   }
 
-  public List<TimeRange> findConflicts(Collection<Event> events,
+  public ImmutableList<TimeRange> findConflicts(Collection<Event> events,
       Collection<String> requestAttendees) {
     List<TimeRange> conflicts = new ArrayList<>();
 
@@ -45,12 +46,10 @@ public final class FindMeetingQuery {
       }
     }
 
-    Collections.sort(conflicts, TimeRange.ORDER_BY_START);
-
-    return conflicts;
+    return ImmutableList.sortedCopyOf(TimeRange.ORDER_BY_START, conflicts);
   }
 
-  public List<TimeRange> mergeOverlappingRanges(List<TimeRange> conflicts) {
+  public ImmutableList<TimeRange> mergeOverlappingRanges(List<TimeRange> conflicts) {
     List<TimeRange> conflictingTimes = new ArrayList<>();
     TimeRange first = null;
     TimeRange second = null;
@@ -84,7 +83,7 @@ public final class FindMeetingQuery {
     }
 
     if (conflicts.size() == 0 || nested) {
-      return conflictingTimes;
+      return ImmutableList.copyOf(conflictingTimes);
     }
 
     if (conflicts.size() == 1) {
@@ -95,15 +94,15 @@ public final class FindMeetingQuery {
       conflictingTimes.add(second);
     }
 
-    return conflictingTimes;
+    return ImmutableList.copyOf(conflictingTimes);
   }
 
-  public List<TimeRange> findPossibleTimes(List<TimeRange> conflictingTimes, long meetingDuration) {
+  public ImmutableList<TimeRange> findPossibleTimes(List<TimeRange> conflictingTimes, long meetingDuration) {
     List<TimeRange> possibleTimes = new ArrayList<>();
 
     if (conflictingTimes.isEmpty()) {
       addTimeIfLongEnough(TimeRange.WHOLE_DAY, meetingDuration, possibleTimes);
-      return possibleTimes;
+      return ImmutableList.copyOf(possibleTimes);
     }
 
     TimeRange initial = conflictingTimes.get(0);
@@ -122,7 +121,7 @@ public final class FindMeetingQuery {
     valid = TimeRange.fromStartEnd(last.end(), TimeRange.END_OF_DAY, true);
     addTimeIfLongEnough(valid, meetingDuration, possibleTimes);
 
-    return possibleTimes;
+    return ImmutableList.copyOf(possibleTimes);
   }
 
   public void addTimeIfLongEnough(TimeRange time, long minDuration, List<TimeRange> timeList) {
