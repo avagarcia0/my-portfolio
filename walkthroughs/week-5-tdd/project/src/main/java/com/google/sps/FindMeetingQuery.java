@@ -28,7 +28,7 @@ public final class FindMeetingQuery {
     return possibleTimes;
   }
 
-  public ImmutableList<TimeRange> findConflictingTimes(
+  private ImmutableList<TimeRange> findConflictingTimes(
       Collection<Event> events, Collection<String> attendees) {
     List<TimeRange> conflicts = findConflicts(events, attendees);
     List<TimeRange> conflictingTimes = mergeOverlappingRanges(conflicts);
@@ -36,7 +36,7 @@ public final class FindMeetingQuery {
     return ImmutableList.copyOf(conflictingTimes);
   }
 
-  public ImmutableList<TimeRange> findConflicts(
+  private ImmutableList<TimeRange> findConflicts(
       Collection<Event> events, Collection<String> requestAttendees) {
     List<TimeRange> conflicts = new ArrayList<>();
 
@@ -50,7 +50,7 @@ public final class FindMeetingQuery {
         TimeRange.ORDER_BY_START.thenComparing(TimeRange.ORDER_BY_END.reversed()), conflicts);
   }
 
-  public ImmutableList<TimeRange> mergeOverlappingRanges(List<TimeRange> conflicts) {
+  private ImmutableList<TimeRange> mergeOverlappingRanges(List<TimeRange> conflicts) {
     List<TimeRange> unnestedConflicts = removeNestedTimeRanges(conflicts);
     List<TimeRange> conflictingTimes = new ArrayList<>();
     int startIndex = 0;
@@ -70,7 +70,7 @@ public final class FindMeetingQuery {
     return ImmutableList.copyOf(conflictingTimes);
   }
 
-  public ImmutableList<TimeRange> removeNestedTimeRanges(List<TimeRange> conflicts) {
+  private ImmutableList<TimeRange> removeNestedTimeRanges(List<TimeRange> conflicts) {
     List<TimeRange> unnestedConflicts = new ArrayList<>();
 
     if (conflicts.isEmpty()) {
@@ -88,7 +88,7 @@ public final class FindMeetingQuery {
     return ImmutableList.copyOf(unnestedConflicts);
   }
 
-  public int findEndOfOverlap(List<TimeRange> conflicts, int startIndex) {
+  private int findEndOfOverlap(List<TimeRange> conflicts, int startIndex) {
     for (int endIndex = startIndex + 1; endIndex < conflicts.size(); endIndex++) {
       if (!conflicts.get(endIndex - 1).overlaps(conflicts.get(endIndex))) {
         return endIndex;
@@ -98,7 +98,7 @@ public final class FindMeetingQuery {
     return conflicts.size();
   }
 
-  public ImmutableList<TimeRange> findPossibleTimes(
+  private ImmutableList<TimeRange> findPossibleTimes(
       List<TimeRange> conflictingTimes, long meetingDuration) {
     List<TimeRange> possibleTimes = new ArrayList<>();
 
@@ -126,7 +126,7 @@ public final class FindMeetingQuery {
     return ImmutableList.copyOf(possibleTimes);
   }
 
-  public void addTimeIfLongEnough(TimeRange time, long minDuration, List<TimeRange> timeList) {
+  private void addTimeIfLongEnough(TimeRange time, long minDuration, List<TimeRange> timeList) {
     if (time.duration() >= minDuration) {
       timeList.add(time);
     }
