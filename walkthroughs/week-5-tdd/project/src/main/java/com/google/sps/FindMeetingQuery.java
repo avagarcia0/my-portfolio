@@ -15,9 +15,9 @@
 package com.google.sps;
 
 import com.google.common.collect.ImmutableList;
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
-import java.util.ArrayList;
 import java.util.List;
 
 public final class FindMeetingQuery {
@@ -28,16 +28,16 @@ public final class FindMeetingQuery {
     return possibleTimes;
   }
 
-  public ImmutableList<TimeRange> findConflictingTimes(Collection<Event> events,
-      Collection<String> attendees) {
+  public ImmutableList<TimeRange> findConflictingTimes(
+      Collection<Event> events, Collection<String> attendees) {
     List<TimeRange> conflicts = findConflicts(events, attendees);
     List<TimeRange> conflictingTimes = mergeOverlappingRanges(conflicts);
 
     return ImmutableList.copyOf(conflictingTimes);
   }
 
-  public ImmutableList<TimeRange> findConflicts(Collection<Event> events,
-      Collection<String> requestAttendees) {
+  public ImmutableList<TimeRange> findConflicts(
+      Collection<Event> events, Collection<String> requestAttendees) {
     List<TimeRange> conflicts = new ArrayList<>();
 
     for (Event event : events) {
@@ -97,7 +97,8 @@ public final class FindMeetingQuery {
     return ImmutableList.copyOf(conflictingTimes);
   }
 
-  public ImmutableList<TimeRange> findPossibleTimes(List<TimeRange> conflictingTimes, long meetingDuration) {
+  public ImmutableList<TimeRange> findPossibleTimes(
+      List<TimeRange> conflictingTimes, long meetingDuration) {
     List<TimeRange> possibleTimes = new ArrayList<>();
 
     if (conflictingTimes.isEmpty()) {
