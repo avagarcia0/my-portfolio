@@ -103,32 +103,39 @@ public final class FindMeetingQuery {
     List<TimeRange> possibleTimes = new ArrayList<>();
 
     if (conflictingTimes.isEmpty()) {
-      addTimeIfLongEnough(TimeRange.WHOLE_DAY, meetingDuration, possibleTimes);
+      possibleTimes = addTimeIfLongEnough(TimeRange.WHOLE_DAY, meetingDuration, possibleTimes);
       return ImmutableList.copyOf(possibleTimes);
     }
 
     TimeRange initial = conflictingTimes.get(0);
     TimeRange valid = TimeRange.fromStartEnd(TimeRange.START_OF_DAY, initial.start(), false);
-    addTimeIfLongEnough(valid, meetingDuration, possibleTimes);
+    possibleTimes = addTimeIfLongEnough(valid, meetingDuration, possibleTimes);
 
     for (int i = 0; i < conflictingTimes.size() - 1; i++) {
       TimeRange first = conflictingTimes.get(i);
       TimeRange second = conflictingTimes.get(i + 1);
 
       valid = TimeRange.fromStartEnd(first.end(), second.start(), false);
-      addTimeIfLongEnough(valid, meetingDuration, possibleTimes);
+      possibleTimes = addTimeIfLongEnough(valid, meetingDuration, possibleTimes);
     }
 
     TimeRange last = conflictingTimes.get(conflictingTimes.size() - 1);
     valid = TimeRange.fromStartEnd(last.end(), TimeRange.END_OF_DAY, true);
-    addTimeIfLongEnough(valid, meetingDuration, possibleTimes);
+    possibleTimes = addTimeIfLongEnough(valid, meetingDuration, possibleTimes);
 
     return ImmutableList.copyOf(possibleTimes);
   }
 
-  private void addTimeIfLongEnough(TimeRange time, long minDuration, List<TimeRange> timeList) {
+  private ImmutableList<TimeRange> addTimeIfLongEnough(
+      TimeRange time, long minDuration, List<TimeRange> timeList) {
+    List<TimeRange> newTimeList = new ArrayList<>();
+
+    newTimeList.addAll(timeList);
+
     if (time.duration() >= minDuration) {
-      timeList.add(time);
+      newTimeList.add(time);
     }
+
+    return ImmutableList.copyOf(newTimeList);
   }
 }
