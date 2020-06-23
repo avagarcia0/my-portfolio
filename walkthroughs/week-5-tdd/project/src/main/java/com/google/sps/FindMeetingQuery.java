@@ -46,55 +46,56 @@ public final class FindMeetingQuery {
       }
     }
 
-    return ImmutableList.sortedCopyOf(TimeRange.ORDER_BY_START, conflicts);
+    return ImmutableList.sortedCopyOf(
+        TimeRange.ORDER_BY_START.thenComparing(TimeRange.ORDER_BY_END.reversed()), conflicts);
   }
 
   public ImmutableList<TimeRange> mergeOverlappingRanges(List<TimeRange> conflicts) {
+    List<TimeRange> unnestedConflicts = removeNestedTimeRanges(conflicts);
     List<TimeRange> conflictingTimes = new ArrayList<>();
-    TimeRange first = null;
-    TimeRange second = null;
-    TimeRange combined = null;
-    boolean nested = false;
-    boolean useCombinedRange = false;
+    int startIndex = 0;
 
-    for (int i = 0; i < conflicts.size() - 1; i++) {
-      if (useCombinedRange) {
-        first = combined;
-        useCombinedRange = false;
-      } else {
-        first = conflicts.get(i);
-      }
+    while (startIndex < unnestedConflicts.size()) {
+      int endIndex = findEndOfOverlap(unnestedConflicts, startIndex);
 
-      second = conflicts.get(i + 1);
-      nested = false;
+      TimeRange startRange = unnestedConflicts.get(startIndex);
+      TimeRange endRange = unnestedConflicts.get(endIndex - 1);
+      TimeRange overlap = TimeRange.fromStartEnd(startRange.start(), endRange.end(), false);
 
-      if (!first.overlaps(second)) {
-        conflictingTimes.add(first);
-      } else if (!first.contains(second)) {
-        combined = TimeRange.fromStartEnd(first.start(), second.end(), false);
-        useCombinedRange = true;
-      } else {
-        conflictingTimes.add(first);
-        nested = true;
+      conflictingTimes.add(overlap);
 
-        // Skip over adding the second TimeRange
-        i++;
-      }
-    }
-
-    if (conflicts.size() == 0 || nested) {
-      return ImmutableList.copyOf(conflictingTimes);
-    }
-
-    if (conflicts.size() == 1) {
-      conflictingTimes.add(conflicts.get(0));
-    } else if (useCombinedRange) {
-      conflictingTimes.add(combined);
-    } else {
-      conflictingTimes.add(second);
+      startIndex = endIndex;
     }
 
     return ImmutableList.copyOf(conflictingTimes);
+  }
+
+  public ImmutableList<TimeRange> removeNestedTimeRanges(List<TimeRange> conflicts) {
+    List<TimeRange> unnestedConflicts = new ArrayList<>();
+
+    if (conflicts.isEmpty()) {
+      return ImmutableList.copyOf(unnestedConflicts);
+    }
+
+    unnestedConflicts.add(conflicts.get(0));
+
+    for (TimeRange conflict : conflicts) {
+      if (!unnestedConflicts.get(unnestedConflicts.size() - 1).contains(conflict)) {
+        unnestedConflicts.add(conflict);
+      }
+    }
+
+    return ImmutableList.copyOf(unnestedConflicts);
+  }
+
+  public int findEndOfOverlap(List<TimeRange> conflicts, int startIndex) {
+    for (int endIndex = startIndex + 1; endIndex < conflicts.size(); endIndex++) {
+      if (!conflicts.get(endIndex - 1).overlaps(conflicts.get(endIndex))) {
+        return endIndex;
+      }
+    }
+
+    return conflicts.size();
   }
 
   public ImmutableList<TimeRange> findPossibleTimes(
