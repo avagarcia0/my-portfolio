@@ -46,12 +46,15 @@ public final class FindMeetingQuery {
       }
     }
 
-    return ImmutableList.sortedCopyOf(
-        TimeRange.ORDER_BY_START.thenComparing(TimeRange.ORDER_BY_END.reversed()), builder.build());
+    return builder.build();
   }
 
   private ImmutableList<TimeRange> mergeOverlappingRanges(List<TimeRange> conflicts) {
-    List<TimeRange> unnestedConflicts = removeNestedTimeRanges(conflicts);
+    ImmutableList<TimeRange> sortedConflicts = ImmutableList.sortedCopyOf(
+        TimeRange.ORDER_BY_START.thenComparing(TimeRange.ORDER_BY_END.reversed()), conflicts);
+
+    List<TimeRange> unnestedConflicts = removeNestedTimeRanges(sortedConflicts);
+
     ImmutableList.Builder<TimeRange> builder = new ImmutableList.Builder<TimeRange>();
     int startIndex = 0;
 
