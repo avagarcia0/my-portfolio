@@ -38,21 +38,21 @@ public final class FindMeetingQuery {
 
   private ImmutableList<TimeRange> findConflicts(
       Collection<Event> events, Collection<String> requestAttendees) {
-    List<TimeRange> conflicts = new ArrayList<>();
+    ImmutableList.Builder<TimeRange> builder = new ImmutableList.Builder<TimeRange>();
 
     for (Event event : events) {
       if (!Collections.disjoint(requestAttendees, event.getAttendees())) {
-        conflicts.add(event.getWhen());
+        builder.add(event.getWhen());
       }
     }
 
     return ImmutableList.sortedCopyOf(
-        TimeRange.ORDER_BY_START.thenComparing(TimeRange.ORDER_BY_END.reversed()), conflicts);
+        TimeRange.ORDER_BY_START.thenComparing(TimeRange.ORDER_BY_END.reversed()), builder.build());
   }
 
   private ImmutableList<TimeRange> mergeOverlappingRanges(List<TimeRange> conflicts) {
     List<TimeRange> unnestedConflicts = removeNestedTimeRanges(conflicts);
-    List<TimeRange> conflictingTimes = new ArrayList<>();
+    ImmutableList.Builder<TimeRange> builder = new ImmutableList.Builder<TimeRange>();
     int startIndex = 0;
 
     while (startIndex < unnestedConflicts.size()) {
@@ -62,30 +62,32 @@ public final class FindMeetingQuery {
       TimeRange endRange = unnestedConflicts.get(endIndex - 1);
       TimeRange overlap = TimeRange.fromStartEnd(startRange.start(), endRange.end(), false);
 
-      conflictingTimes.add(overlap);
+      builder.add(overlap);
 
       startIndex = endIndex;
     }
 
-    return ImmutableList.copyOf(conflictingTimes);
+    return builder.build();
   }
 
   private ImmutableList<TimeRange> removeNestedTimeRanges(List<TimeRange> conflicts) {
-    List<TimeRange> unnestedConflicts = new ArrayList<>();
+    ImmutableList.Builder<TimeRange> builder = new ImmutableList.Builder<TimeRange>();
 
     if (conflicts.isEmpty()) {
-      return ImmutableList.copyOf(unnestedConflicts);
+      return builder.build();
     }
 
-    unnestedConflicts.add(conflicts.get(0));
+    TimeRange lastAdded = conflicts.get(0);
+    builder.add(lastAdded);
 
     for (TimeRange conflict : conflicts) {
-      if (!unnestedConflicts.get(unnestedConflicts.size() - 1).contains(conflict)) {
-        unnestedConflicts.add(conflict);
+      if (!lastAdded.contains(conflict)) {
+        builder.add(conflict);
+        lastAdded = conflict;
       }
     }
 
-    return ImmutableList.copyOf(unnestedConflicts);
+    return builder.build();
   }
 
   private int findEndOfOverlap(List<TimeRange> conflicts, int startIndex) {
@@ -128,14 +130,14 @@ public final class FindMeetingQuery {
 
   private ImmutableList<TimeRange> addTimeIfLongEnough(
       TimeRange time, long minDuration, List<TimeRange> timeList) {
-    List<TimeRange> newTimeList = new ArrayList<>();
+    ImmutableList.Builder<TimeRange> builder = new ImmutableList.Builder<TimeRange>();
 
-    newTimeList.addAll(timeList);
+    builder.addAll(timeList);
 
     if (time.duration() >= minDuration) {
-      newTimeList.add(time);
+      builder.add(time);
     }
 
-    return ImmutableList.copyOf(newTimeList);
+    return builder.build();
   }
 }
