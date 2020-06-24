@@ -15,25 +15,25 @@
 package com.google.sps;
 
 import com.google.common.collect.ImmutableList;
-import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
-import java.util.List;
 
 public final class FindMeetingQuery {
   public Collection<TimeRange> query(Collection<Event> events, MeetingRequest request) {
-    List<TimeRange> conflictingTimes = findConflictingTimes(events, request.getAttendees());
-    List<TimeRange> possibleTimes = findPossibleTimes(conflictingTimes, request.getDuration());
+    ImmutableList<TimeRange> conflictingTimes =
+        findConflictingTimes(events, request.getAttendees());
+    ImmutableList<TimeRange> possibleTimes =
+        findPossibleTimes(conflictingTimes, request.getDuration());
 
     return possibleTimes;
   }
 
   private ImmutableList<TimeRange> findConflictingTimes(
       Collection<Event> events, Collection<String> attendees) {
-    List<TimeRange> conflicts = findConflicts(events, attendees);
-    List<TimeRange> conflictingTimes = mergeOverlappingRanges(conflicts);
+    ImmutableList<TimeRange> conflicts = findConflicts(events, attendees);
+    ImmutableList<TimeRange> conflictingTimes = mergeOverlappingRanges(conflicts);
 
-    return ImmutableList.copyOf(conflictingTimes);
+    return conflictingTimes;
   }
 
   private ImmutableList<TimeRange> findConflicts(
@@ -49,11 +49,11 @@ public final class FindMeetingQuery {
     return builder.build();
   }
 
-  private ImmutableList<TimeRange> mergeOverlappingRanges(List<TimeRange> conflicts) {
+  private ImmutableList<TimeRange> mergeOverlappingRanges(ImmutableList<TimeRange> conflicts) {
     ImmutableList<TimeRange> sortedConflicts = ImmutableList.sortedCopyOf(
         TimeRange.ORDER_BY_START.thenComparing(TimeRange.ORDER_BY_END.reversed()), conflicts);
 
-    List<TimeRange> unnestedConflicts = removeNestedTimeRanges(sortedConflicts);
+    ImmutableList<TimeRange> unnestedConflicts = removeNestedTimeRanges(sortedConflicts);
 
     ImmutableList.Builder<TimeRange> builder = new ImmutableList.Builder<TimeRange>();
     int startIndex = 0;
@@ -73,7 +73,7 @@ public final class FindMeetingQuery {
     return builder.build();
   }
 
-  private ImmutableList<TimeRange> removeNestedTimeRanges(List<TimeRange> conflicts) {
+  private ImmutableList<TimeRange> removeNestedTimeRanges(ImmutableList<TimeRange> conflicts) {
     ImmutableList.Builder<TimeRange> builder = new ImmutableList.Builder<TimeRange>();
 
     if (conflicts.isEmpty()) {
@@ -93,7 +93,7 @@ public final class FindMeetingQuery {
     return builder.build();
   }
 
-  private int findEndOfOverlap(List<TimeRange> conflicts, int startIndex) {
+  private int findEndOfOverlap(ImmutableList<TimeRange> conflicts, int startIndex) {
     for (int endIndex = startIndex + 1; endIndex < conflicts.size(); endIndex++) {
       if (!conflicts.get(endIndex - 1).overlaps(conflicts.get(endIndex))) {
         return endIndex;
@@ -104,12 +104,12 @@ public final class FindMeetingQuery {
   }
 
   private ImmutableList<TimeRange> findPossibleTimes(
-      List<TimeRange> conflictingTimes, long meetingDuration) {
-    List<TimeRange> possibleTimes = new ArrayList<>();
+      ImmutableList<TimeRange> conflictingTimes, long meetingDuration) {
+    ImmutableList<TimeRange> possibleTimes = new ImmutableList.Builder<TimeRange>().build();
 
     if (conflictingTimes.isEmpty()) {
       possibleTimes = addTimeIfLongEnough(TimeRange.WHOLE_DAY, meetingDuration, possibleTimes);
-      return ImmutableList.copyOf(possibleTimes);
+      return possibleTimes;
     }
 
     TimeRange initial = conflictingTimes.get(0);
@@ -128,11 +128,11 @@ public final class FindMeetingQuery {
     valid = TimeRange.fromStartEnd(last.end(), TimeRange.END_OF_DAY, true);
     possibleTimes = addTimeIfLongEnough(valid, meetingDuration, possibleTimes);
 
-    return ImmutableList.copyOf(possibleTimes);
+    return possibleTimes;
   }
 
   private ImmutableList<TimeRange> addTimeIfLongEnough(
-      TimeRange time, long minDuration, List<TimeRange> timeList) {
+      TimeRange time, long minDuration, ImmutableList<TimeRange> timeList) {
     ImmutableList.Builder<TimeRange> builder = new ImmutableList.Builder<TimeRange>();
 
     builder.addAll(timeList);
