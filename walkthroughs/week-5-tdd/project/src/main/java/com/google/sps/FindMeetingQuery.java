@@ -73,6 +73,7 @@ public final class FindMeetingQuery {
     return builder.build();
   }
 
+  /* This method requires that conflicts be sorted by start time, then by reverse end time. */
   private ImmutableList<TimeRange> removeNestedTimeRanges(ImmutableList<TimeRange> conflicts) {
     ImmutableList.Builder<TimeRange> builder = new ImmutableList.Builder<TimeRange>();
 
@@ -93,6 +94,10 @@ public final class FindMeetingQuery {
     return builder.build();
   }
 
+  /*
+   * This method finds the chain of overlapping TimeRanges in conflicts that starts at startIndex,
+   * then returns the index of the last TimeRange in that chain.
+   */
   private int findEndOfOverlap(ImmutableList<TimeRange> conflicts, int startIndex) {
     for (int endIndex = startIndex + 1; endIndex < conflicts.size(); endIndex++) {
       if (!conflicts.get(endIndex - 1).overlaps(conflicts.get(endIndex))) {
