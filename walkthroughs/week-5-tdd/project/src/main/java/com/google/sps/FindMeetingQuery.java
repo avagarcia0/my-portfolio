@@ -22,14 +22,14 @@ import java.util.List;
 
 public final class FindMeetingQuery {
   public Collection<TimeRange> query(Collection<Event> events, MeetingRequest request) {
-    Collection<String> attendees = new HashSet<>();
+    Collection<String> allAttendees = new HashSet<>();
     List<TimeRange> possibleTimes;
     long duration = request.getDuration();
 
-    attendees.addAll(request.getAttendees());
-    attendees.addAll(request.getOptionalAttendees());
+    allAttendees.addAll(request.getAttendees());
+    allAttendees.addAll(request.getOptionalAttendees());
 
-    possibleTimes = findTimesForAllAttendees(events, attendees, duration);
+    possibleTimes = findTimesForAllAttendees(events, allAttendees, duration);
 
     if (possibleTimes.isEmpty() && !request.getAttendees().isEmpty()) {
       possibleTimes = findTimesForAllAttendees(events, request.getAttendees(), duration);
