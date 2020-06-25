@@ -110,7 +110,7 @@ public final class FindMeetingQuery {
 
   private ImmutableList<TimeRange> findPossibleTimes(
       ImmutableList<TimeRange> conflictingTimes, long meetingDuration) {
-    ImmutableList<TimeRange> possibleTimes = new ImmutableList.Builder<TimeRange>().build();
+    ImmutableList<TimeRange> possibleTimes = ImmutableList.of();
 
     if (conflictingTimes.isEmpty()) {
       possibleTimes = addTimeIfLongEnough(TimeRange.WHOLE_DAY, meetingDuration, possibleTimes);
