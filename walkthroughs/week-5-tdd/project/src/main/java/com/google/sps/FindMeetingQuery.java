@@ -96,7 +96,7 @@ public final class FindMeetingQuery {
 
   /*
    * This method finds the chain of overlapping TimeRanges in conflicts that starts at startIndex,
-   * then returns the index of the last TimeRange in that chain.
+   * then returns the index after the last TimeRange in that chain.
    */
   private int findEndOfOverlap(ImmutableList<TimeRange> conflicts, int startIndex) {
     for (int endIndex = startIndex + 1; endIndex < conflicts.size(); endIndex++) {
