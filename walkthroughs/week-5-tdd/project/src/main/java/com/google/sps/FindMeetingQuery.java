@@ -17,13 +17,30 @@ package com.google.sps;
 import com.google.common.collect.ImmutableList;
 import java.util.Collection;
 import java.util.Collections;
+import java.util.HashSet;
 
 public final class FindMeetingQuery {
   public Collection<TimeRange> query(Collection<Event> events, MeetingRequest request) {
-    ImmutableList<TimeRange> conflictingTimes =
-        findConflictingTimes(events, request.getAttendees());
-    ImmutableList<TimeRange> possibleTimes =
-        findPossibleTimes(conflictingTimes, request.getDuration());
+    Collection<String> allAttendees = new HashSet<>();
+    ImmutableList<TimeRange> possibleTimes;
+    long duration = request.getDuration();
+
+    allAttendees.addAll(request.getAttendees());
+    allAttendees.addAll(request.getOptionalAttendees());
+
+    possibleTimes = findTimesForAllAttendees(events, allAttendees, duration);
+
+    if (possibleTimes.isEmpty() && !request.getAttendees().isEmpty()) {
+      possibleTimes = findTimesForAllAttendees(events, request.getAttendees(), duration);
+    }
+
+    return possibleTimes;
+  }
+
+  public ImmutableList<TimeRange> findTimesForAllAttendees(
+      Collection<Event> events, Collection<String> attendees, long duration) {
+    ImmutableList<TimeRange> conflictingTimes = findConflictingTimes(events, attendees);
+    ImmutableList<TimeRange> possibleTimes = findPossibleTimes(conflictingTimes, duration);
 
     return possibleTimes;
   }
