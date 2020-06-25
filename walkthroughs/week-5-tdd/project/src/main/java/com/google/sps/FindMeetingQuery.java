@@ -14,16 +14,15 @@
 
 package com.google.sps;
 
-import java.util.ArrayList;
+import com.google.common.collect.ImmutableList;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.HashSet;
-import java.util.List;
 
 public final class FindMeetingQuery {
   public Collection<TimeRange> query(Collection<Event> events, MeetingRequest request) {
     Collection<String> allAttendees = new HashSet<>();
-    List<TimeRange> possibleTimes;
+    ImmutableList<TimeRange> possibleTimes;
     long duration = request.getDuration();
 
     allAttendees.addAll(request.getAttendees());
@@ -38,68 +37,132 @@ public final class FindMeetingQuery {
     return possibleTimes;
   }
 
-  public List<TimeRange> findTimesForAllAttendees(Collection<Event> events,
-      Collection<String> attendees, long duration) {
-    List<TimeRange> possibleTimes = new ArrayList<>();
-    List<TimeRange> conflictingTimes = new ArrayList<>();
+  public ImmutableList<TimeRange> findTimesForAllAttendees(
+      Collection<Event> events, Collection<String> attendees, long duration) {
+    ImmutableList<TimeRange> conflictingTimes = findConflictingTimes(events, attendees);
+    ImmutableList<TimeRange> possibleTimes = findPossibleTimes(conflictingTimes, duration);
 
-    // Find every TimeRange that needs to be avoided
+    return possibleTimes;
+  }
+
+  private ImmutableList<TimeRange> findConflictingTimes(
+      Collection<Event> events, Collection<String> attendees) {
+    ImmutableList<TimeRange> conflicts = findConflicts(events, attendees);
+    ImmutableList<TimeRange> conflictingTimes = mergeOverlappingRanges(conflicts);
+
+    return conflictingTimes;
+  }
+
+  private ImmutableList<TimeRange> findConflicts(
+      Collection<Event> events, Collection<String> requestAttendees) {
+    ImmutableList.Builder<TimeRange> builder = new ImmutableList.Builder<TimeRange>();
+
     for (Event event : events) {
-      for (String attendee : event.getAttendees()) {
-        if (attendees.contains(attendee)) {
-          conflictingTimes.add(event.getWhen());
-          break;
-        }
+      if (!Collections.disjoint(requestAttendees, event.getAttendees())) {
+        builder.add(event.getWhen());
       }
     }
 
-    Collections.sort(conflictingTimes, TimeRange.ORDER_BY_START);
+    return builder.build();
+  }
 
-    // Remove duplicates and overlaps
+  private ImmutableList<TimeRange> mergeOverlappingRanges(ImmutableList<TimeRange> conflicts) {
+    ImmutableList<TimeRange> sortedConflicts = ImmutableList.sortedCopyOf(
+        TimeRange.ORDER_BY_START.thenComparing(TimeRange.ORDER_BY_END.reversed()), conflicts);
+
+    ImmutableList<TimeRange> unnestedConflicts = removeNestedTimeRanges(sortedConflicts);
+
+    ImmutableList.Builder<TimeRange> builder = new ImmutableList.Builder<TimeRange>();
+    int startIndex = 0;
+
+    while (startIndex < unnestedConflicts.size()) {
+      int endIndex = findEndOfOverlap(unnestedConflicts, startIndex);
+
+      TimeRange startRange = unnestedConflicts.get(startIndex);
+      TimeRange endRange = unnestedConflicts.get(endIndex - 1);
+      TimeRange overlap = TimeRange.fromStartEnd(startRange.start(), endRange.end(), false);
+
+      builder.add(overlap);
+
+      startIndex = endIndex;
+    }
+
+    return builder.build();
+  }
+
+  /* This method requires that conflicts be sorted by start time, then by reverse end time. */
+  private ImmutableList<TimeRange> removeNestedTimeRanges(ImmutableList<TimeRange> conflicts) {
+    ImmutableList.Builder<TimeRange> builder = new ImmutableList.Builder<TimeRange>();
+
+    if (conflicts.isEmpty()) {
+      return builder.build();
+    }
+
+    TimeRange lastAdded = conflicts.get(0);
+    builder.add(lastAdded);
+
+    for (TimeRange conflict : conflicts) {
+      if (!lastAdded.contains(conflict)) {
+        builder.add(conflict);
+        lastAdded = conflict;
+      }
+    }
+
+    return builder.build();
+  }
+
+  /*
+   * This method finds the chain of overlapping TimeRanges in conflicts that starts at startIndex,
+   * then returns the index after the last TimeRange in that chain.
+   */
+  private int findEndOfOverlap(ImmutableList<TimeRange> conflicts, int startIndex) {
+    for (int endIndex = startIndex + 1; endIndex < conflicts.size(); endIndex++) {
+      if (!conflicts.get(endIndex - 1).overlaps(conflicts.get(endIndex))) {
+        return endIndex;
+      }
+    }
+
+    return conflicts.size();
+  }
+
+  private ImmutableList<TimeRange> findPossibleTimes(
+      ImmutableList<TimeRange> conflictingTimes, long meetingDuration) {
+    ImmutableList<TimeRange> possibleTimes = ImmutableList.of();
+
+    if (conflictingTimes.isEmpty()) {
+      possibleTimes = addTimeIfLongEnough(TimeRange.WHOLE_DAY, meetingDuration, possibleTimes);
+      return possibleTimes;
+    }
+
+    TimeRange initial = conflictingTimes.get(0);
+    TimeRange valid = TimeRange.fromStartEnd(TimeRange.START_OF_DAY, initial.start(), false);
+    possibleTimes = addTimeIfLongEnough(valid, meetingDuration, possibleTimes);
+
     for (int i = 0; i < conflictingTimes.size() - 1; i++) {
       TimeRange first = conflictingTimes.get(i);
       TimeRange second = conflictingTimes.get(i + 1);
 
-      if (first.overlaps(second)) {
-        if (!first.contains(second)) {
-          TimeRange combined = TimeRange.fromStartEnd(first.start(), second.end(), false);
-          conflictingTimes.set(i, combined);
-        }
-
-        conflictingTimes.remove(second);
-        i--;
-      }
+      valid = TimeRange.fromStartEnd(first.end(), second.start(), false);
+      possibleTimes = addTimeIfLongEnough(valid, meetingDuration, possibleTimes);
     }
 
-    // Find every TimeRange that doesn't have a conflict
-    if (conflictingTimes.isEmpty()) {
-      possibleTimes.add(TimeRange.WHOLE_DAY);
-    } else {
-      TimeRange initial = conflictingTimes.get(0);
-      TimeRange valid = TimeRange.fromStartEnd(TimeRange.START_OF_DAY, initial.start(), false);
-      possibleTimes.add(valid);
-
-      for (int i = 0; i < conflictingTimes.size() - 1; i++) {
-        TimeRange first = conflictingTimes.get(i);
-        TimeRange second = conflictingTimes.get(i + 1);
-
-        valid = TimeRange.fromStartEnd(first.end(), second.start(), false);
-        possibleTimes.add(valid);
-      }
-
-      TimeRange last = conflictingTimes.get(conflictingTimes.size() - 1);
-      valid = TimeRange.fromStartEnd(last.end(), TimeRange.END_OF_DAY, true);
-      possibleTimes.add(valid);
-    }
-
-    // Remove every TimeRange that is too short
-    for (int i = 0; i < possibleTimes.size(); i++) {
-      if (possibleTimes.get(i).duration() < duration) {
-        possibleTimes.remove(i);
-        i--;
-      }
-    }
+    TimeRange last = conflictingTimes.get(conflictingTimes.size() - 1);
+    valid = TimeRange.fromStartEnd(last.end(), TimeRange.END_OF_DAY, true);
+    possibleTimes = addTimeIfLongEnough(valid, meetingDuration, possibleTimes);
 
     return possibleTimes;
+  }
+
+  private ImmutableList<TimeRange> addTimeIfLongEnough(
+      TimeRange time, long minDuration, ImmutableList<TimeRange> timeList) {
+    ImmutableList.Builder<TimeRange> builder = new ImmutableList.Builder<TimeRange>();
+
+    builder.addAll(timeList);
+
+    if (time.duration() >= minDuration) {
+      builder.add(time);
+    }
+
+    return builder.build();
   }
 }
